@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS - AI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-shield"></i> JARVIS Access Control</h2>
+            </div>
+            <div class="modal-body">
+                <div class="auth-container">
+                    <div class="auth-form" id="loginForm">
+                        <h3>Login</h3>
+                        <input type="text" id="loginUsername" placeholder="Username" required>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                        <button onclick="login()" class="auth-btn">Access JARVIS</button>
+                        <p>Don't have access? <a href="#" onclick="showRegister()">Register</a></p>
+                    </div>
+                    
+                    <div class="auth-form hidden" id="registerForm">
+                        <h3>Register</h3>
+                        <input type="text" id="registerUsername" placeholder="Username" required>
+                        <input type="email" id="registerEmail" placeholder="Email" required>
+                        <input type="password" id="registerPassword" placeholder="Password" required>
+                        <button onclick="register()" class="auth-btn">Create Access</button>
+                        <p>Already have access? <a href="#" onclick="showLogin()">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Interface -->
+    <div id="mainInterface" class="hidden">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>JARVIS</h1>
+                    <span class="subtitle">Just A Rather Very Intelligent System</span>
+                </div>
+                <div class="user-controls">
+                    <div class="status-indicator">
+                        <div class="status-light" id="statusLight"></div>
+                        <span id="statusText">Ready</span>
+                    </div>
+                    <button onclick="logout()" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Central Core -->
+            <div class="central-core">
+                <div class="core-visual" id="coreVisual">
+                    <div class="core-ring"></div>
+                    <div class="core-ring"></div>
+                    <div class="core-ring"></div>
+                    <div class="core-center">
+                        <i class="fas fa-microphone" id="micIcon"></i>
+                    </div>
+                </div>
+                <div class="voice-controls">
+                    <button id="voiceBtn" onclick="startVoiceRecognition()" class="voice-btn">
+                        <i class="fas fa-microphone"></i>
+                        <span>Voice Command</span>
+                    </button>
+                    <button id="stopBtn" onclick="stopListening()" class="voice-btn hidden">
+                        <i class="fas fa-stop"></i>
+                        <span>Stop</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interface Panels -->
+            <div class="interface-panels">
+                <!-- Command Panel -->
+                <div class="panel command-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-terminal"></i> Command Interface</h3>
+                    </div>
+                    <div class="panel-content">
+                        <div class="command-input-area">
+                            <input type="text" id="commandInput" placeholder="Enter command or speak to JARVIS..." onkeypress="handleCommandInput(event)">
+                            <button onclick="processTextCommand()" class="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="language-selector">
+                            <select id="languageSelect">
+                                <option value="auto">Auto-detect</option>
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="it">Italian</option>
+                                <option value="pt">Portuguese</option>
+                                <option value="ru">Russian</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="zh">Chinese</option>
+                                <option value="ar">Arabic</option>
+                                <option value="hi">Hindi</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Panel -->
+                <div class="panel response-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-robot"></i> JARVIS Response</h3>
+                        <button onclick="speakResponse()" class="speak-btn" id="speakBtn" disabled>
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div id="responseArea" class="response-area">
+                            <div class="welcome-message">
+                                <h4>Welcome to JARVIS</h4>
+                                <p>I'm here to assist you with various tasks. You can:</p>
+                                <ul>
+                                    <li>Ask about weather information</li>
+                                    <li>Get latest news updates</li>
+                                    <li>Perform calculations</li>
+                                    <li>Control desktop applications</li>
+                                    <li>Schedule emails and reminders</li>
+                                    <li>Translate text between languages</li>
+                                    <li>Get system information</li>
+                                    <li>And much more...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Monitoring Panel -->
+                <div class="panel system-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-chart-line"></i> System Monitor</h3>
+                        <button onclick="updateSystemInfo()" class="refresh-btn">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div id="systemInfo" class="system-info">
+                            <div class="system-metric">
+                                <div class="metric-label">CPU Usage</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" id="cpuBar"></div>
+                                </div>
+                                <div class="metric-value" id="cpuValue">0%</div>
+                            </div>
+                            <div class="system-metric">
+                                <div class="metric-label">Memory Usage</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" id="memoryBar"></div>
+                                </div>
+                                <div class="metric-value" id="memoryValue">0%</div>
+                            </div>
+                            <div class="system-metric">
+                                <div class="metric-label">Disk Usage</div>
+                                <div class="metric-bar">
+                                    <div class="metric-fill" id="diskBar"></div>
+                                </div>
+                                <div class="metric-value" id="diskValue">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Panel -->
+                <div class="panel history-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-history"></i> Command History</h3>
+                        <button onclick="loadHistory()" class="refresh-btn">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div id="historyArea" class="history-area">
+                            <!-- History items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button onclick="quickCommand('what time is it')" class="quick-btn">
+                <i class="fas fa-clock"></i>
+                <span>Time</span>
+            </button>
+            <button onclick="quickCommand('what is the weather')" class="quick-btn">
+                <i class="fas fa-cloud-sun"></i>
+                <span>Weather</span>
+            </button>
+            <button onclick="quickCommand('get latest news')" class="quick-btn">
+                <i class="fas fa-newspaper"></i>
+                <span>News</span>
+            </button>
+            <button onclick="quickCommand('system information')" class="quick-btn">
+                <i class="fas fa-desktop"></i>
+                <span>System</span>
+            </button>
+            <button onclick="quickCommand('take screenshot')" class="quick-btn">
+                <i class="fas fa-camera"></i>
+                <span>Screenshot</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
