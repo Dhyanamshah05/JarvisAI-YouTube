@@ -1,0 +1,10 @@
+speechrecognition
+openai
+numpy
+pyaudio
+flask
+flask_cors
+sqlalchemy
+schedule
+python-dotenv
+langdetect

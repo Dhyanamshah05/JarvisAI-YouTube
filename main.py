@@ -6,6 +6,17 @@ from config import apikey
 import datetime
 import random
 import numpy as np
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import schedule
+import threading
+import time
+import smtplib
+from email.mime.text import MIMEText
+from langdetect import detect
 
 
 chatStr = ""
@@ -69,6 +80,83 @@ def takeCommand():
         except Exception as e:
             return "Some Error Occurred. Sorry from Jarvis"
 
+app = Flask(__name__)
+CORS(app)
+
+# Database setup
+engine = create_engine('sqlite:///jarvis.db')
+Base = declarative_base()
+Session = sessionmaker(bind=engine)
+session = Session()
+
+class LoginHistory(Base):
+    __tablename__ = 'login_history'
+    id = Column(Integer, primary_key=True)
+    username = Column(String)
+    login_time = Column(DateTime)
+
+Base.metadata.create_all(engine)
+
+# Email scheduling
+scheduled_emails = []
+def send_scheduled_email(to, subject, body):
+    # Replace with your SMTP config
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = 'your@email.com'
+    msg['To'] = to
+    try:
+        with smtplib.SMTP('smtp.example.com', 587) as server:
+            server.starttls()
+            server.login('your@email.com', 'password')
+            server.sendmail('your@email.com', [to], msg.as_string())
+    except Exception as e:
+        print('Email error:', e)
+
+def email_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+threading.Thread(target=email_scheduler, daemon=True).start()
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    data = request.json
+    username = data.get('username')
+    # For demo, accept any login
+    from datetime import datetime
+    lh = LoginHistory(username=username, login_time=datetime.now())
+    session.add(lh)
+    session.commit()
+    return jsonify({'success': True})
+
+@app.route('/api/command', methods=['POST'])
+def api_command():
+    data = request.json
+    command = data.get('command', '')
+    lang = detect(command)
+    if 'schedule email' in command.lower():
+        # Example: schedule email to test@email.com at 10:00 Hello
+        import re
+        m = re.search(r'schedule email to (\S+) at (\d{2}:\d{2}) (.+)', command, re.I)
+        if m:
+            to, at, body = m.groups()
+            schedule.every().day.at(at).do(send_scheduled_email, to, 'Scheduled Email', body)
+            return jsonify({'response': f'Email scheduled to {to} at {at}.'})
+        else:
+            return jsonify({'response': 'Invalid email schedule format.'})
+    # Add more desktop control and smart features here
+    if lang != 'en':
+        return jsonify({'response': f'Detected language: {lang}. Sorry, only English commands are fully supported yet.'})
+    # Use OpenAI for chat
+    try:
+        response = chat(command)
+    except Exception as e:
+        response = f'Error: {e}'
+    return jsonify({'response': response})
+
+
 if __name__ == '__main__':
     print('Welcome to Jarvis A.I')
     say("Jarvis A.I")
@@ -111,8 +199,4 @@ if __name__ == '__main__':
             print("Chatting...")
             chat(query)
 
-
-
-
-
-        # say(query)
+        app.run(host='0.0.0.0', port=5000)
