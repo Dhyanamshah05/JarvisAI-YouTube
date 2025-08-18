@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Jarvis Assistant",
+    "slug": "jarvis-assistant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0f23"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Jarvis needs microphone access to listen to your voice commands.",
+        "NSSpeechRecognitionUsageDescription": "Jarvis uses speech recognition to understand your commands.",
+        "UIBackgroundModes": ["audio", "background-processing"]
+      },
+      "bundleIdentifier": "com.jarvis.assistant"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f0f23"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
+      "package": "com.jarvis.assistant"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Jarvis to access your microphone for voice commands."
+        }
+      ]
+    ]
+  }
+}
