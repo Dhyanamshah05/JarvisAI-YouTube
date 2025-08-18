@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis Assistant - Web Version</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="app-title">🤖 Jarvis Assistant</h1>
+            <div class="header-buttons">
+                <button class="icon-button" onclick="openSettings()">
+                    <span class="material-icons">settings</span>
+                </button>
+                <button class="icon-button" onclick="openCommands()">
+                    <span class="material-icons">list</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Status Display -->
+            <div class="status-container">
+                <div id="status-text" class="status-text">Ready</div>
+            </div>
+
+            <!-- Voice Waveform -->
+            <div class="waveform-container">
+                <div class="waveform" id="waveform">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+
+            <!-- Main Button -->
+            <div class="button-container">
+                <button id="main-button" class="main-button" onclick="toggleListening()">
+                    <span class="material-icons" id="button-icon">mic_none</span>
+                </button>
+            </div>
+
+            <!-- Transcript -->
+            <div id="transcript-container" class="transcript-container" style="display: none;">
+                <div class="transcript-label">You said:</div>
+                <div id="transcript-text" class="transcript-text"></div>
+            </div>
+
+            <!-- Response -->
+            <div id="response-container" class="response-container" style="display: none;">
+                <div class="response-label">Jarvis:</div>
+                <div id="response-text" class="response-text"></div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-container">
+                <div class="instructions-text">Click the microphone button to activate voice recognition</div>
+                <div class="instructions-text">Or type your command below:</div>
+            </div>
+
+            <!-- Text Input -->
+            <div class="text-input-container">
+                <input type="text" id="command-input" class="command-input" placeholder="Type your command here..." onkeypress="handleKeyPress(event)">
+                <button class="send-button" onclick="sendTextCommand()">Send</button>
+            </div>
+        </main>
+
+        <!-- Command History -->
+        <div class="command-history" id="command-history">
+            <div class="history-title">Recent Commands</div>
+            <div class="history-list" id="history-list"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-button" onclick="closeSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>OpenAI API Key (Optional):</label>
+                    <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
+                    <button onclick="saveApiKey()">Save</button>
+                </div>
+                <div class="setting-item">
+                    <label>Voice Recognition:</label>
+                    <input type="checkbox" id="voice-enabled" checked>
+                </div>
+                <div class="setting-item">
+                    <label>Text-to-Speech:</label>
+                    <input type="checkbox" id="tts-enabled" checked>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commands Modal -->
+    <div id="commands-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Voice Commands</h2>
+                <button class="close-button" onclick="closeCommands()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="command-category">
+                    <h3>Time & Date</h3>
+                    <div class="command-example">"What time is it?"</div>
+                    <div class="command-example">"What day is it?"</div>
+                </div>
+                <div class="command-category">
+                    <h3>Calculator</h3>
+                    <div class="command-example">"Calculate 15 plus 27"</div>
+                    <div class="command-example">"What is 10 times 5?"</div>
+                </div>
+                <div class="command-category">
+                    <h3>Conversation</h3>
+                    <div class="command-example">"Hello Jarvis"</div>
+                    <div class="command-example">"Tell me a joke"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
